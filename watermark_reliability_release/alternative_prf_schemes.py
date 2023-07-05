@@ -25,6 +25,11 @@ def seeding_scheme_lookup(seeding_scheme: str):
         context_width = 1
         self_salt = False
         hash_key = 15485863
+    elif seeding_scheme == "simple_0":
+        prf_type = "constant_prf"
+        context_width = 1
+        self_salt = False
+        hash_key = 15485863
     elif seeding_scheme == "algorithm-3" or seeding_scheme == "selfhash":
         prf_type = "anchored_minhash_prf"
         context_width = 4
@@ -114,6 +119,10 @@ def position_prf(input_ids: torch.LongTensor, salt_key: int, k: int = 2) -> int:
     )
 
 
+def constant_prf(input_ids: torch.LongTensor, salt_key: int) -> int:
+    return salt_key
+
+
 prf_lookup = {
     "multiplicative_prf": multiplicative_prf,
     "additive_prf": additive_prf,
@@ -126,6 +135,7 @@ prf_lookup = {
     "minskipgram_prf": minskipgram_prf,
     "noncomm_prf": noncomm_prf,
     "position_prf": position_prf,
+    "constant_prf": constant_prf,
 }
 
 # Generate a global permute table once at startup

@@ -11,7 +11,7 @@ from functools import cache
 
 import re
 import unicodedata
-import homoglyphs as hg
+from .homoglyphs import Categories, Languages, Homoglyphs
 
 
 def normalization_strategy_lookup(strategy_name: str) -> object:
@@ -43,8 +43,8 @@ class HomoglyphCanonizer:
         # self.iso_languages = defaultdict(int)
 
         for char in text:
-            iso_categories[hg.Categories.detect(char)] += 1
-            # for lang in hg.Languages.detect(char):
+            iso_categories[Categories.detect(char)] += 1
+            # for lang in Languages.detect(char):
             #     self.iso_languages[lang] += 1
         target_category = max(iso_categories, key=iso_categories.get)
         all_categories = tuple(iso_categories)
@@ -54,11 +54,11 @@ class HomoglyphCanonizer:
     def _select_canon_category_and_load(
         self, target_category: str, all_categories: tuple[str]
     ) -> dict:
-        homoglyph_table = hg.Homoglyphs(
+        homoglyph_table = Homoglyphs(
             categories=(target_category, "COMMON")
         )  # alphabet loaded here from file
 
-        source_alphabet = hg.Categories.get_alphabet(all_categories)
+        source_alphabet = Categories.get_alphabet(all_categories)
         restricted_table = homoglyph_table.get_restricted_table(
             source_alphabet, homoglyph_table.alphabet
         )  # table loaded here from file
@@ -69,8 +69,8 @@ class HomoglyphCanonizer:
     ) -> str:
         sanitized_text = ""
         for char in homoglyphed_str:
-            # langs = hg.Languages.detect(char)
-            cat = hg.Categories.detect(char)
+            # langs = Languages.detect(char)
+            cat = Categories.detect(char)
             if target_category in cat or "COMMON" in cat or len(cat) == 0:
                 sanitized_text += char
             else:
