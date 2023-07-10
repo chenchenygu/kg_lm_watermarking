@@ -37,6 +37,7 @@ class WatermarkBase:
         delta: float = 2.0,
         seeding_scheme: str = "simple_1",  # simple default, find more schemes in alternative_prf_schemes.py
         select_green_tokens: bool = True,  # should always be the default if not running in legacy mode
+        device = None,
     ):
         # patch now that None could now maybe be passed as seeding_scheme
         if seeding_scheme is None:
@@ -50,6 +51,9 @@ class WatermarkBase:
         self.gamma = gamma
         self.delta = delta
         self.rng = None
+        if device is not None:
+            self.rng = torch.Generator(device=device)
+        self.seeding_scheme = seeding_scheme
         self._initialize_seeding_scheme(seeding_scheme)
         # Legacy behavior:
         self.select_green_tokens = select_green_tokens
