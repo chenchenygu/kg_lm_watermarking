@@ -319,8 +319,8 @@ class WatermarkDetector(WatermarkBase):
         z = numer / denom
         return z
 
-    def _compute_p_value(self, z):
-        p_value = scipy.stats.norm.sf(z)
+    def _compute_p_value(self, observed_count, T):
+        p_value = scipy.stats.binom.sf(observed_count, T, self.gamma)
         return p_value
 
     @lru_cache(maxsize=2**32)
@@ -432,7 +432,7 @@ class WatermarkDetector(WatermarkBase):
             z_score = score_dict.get("z_score")
             if z_score is None:
                 z_score = self._compute_z_score(green_token_count, num_tokens_scored)
-            score_dict.update(dict(p_value=self._compute_p_value(z_score)))
+            score_dict.update(dict(p_value=self._compute_p_value(green_token_count, num_tokens_scored)))
         if return_green_token_mask:
             score_dict.update(dict(green_token_mask=green_token_mask.tolist()))
         if return_z_at_T:
@@ -562,7 +562,7 @@ class WatermarkDetector(WatermarkBase):
             score_dict.update(dict(z_score_at_T=z_score_at_T))
         if return_p_value:
             z_score = score_dict.get("z_score", optimal_z)
-            score_dict.update(dict(p_value=self._compute_p_value(z_score)))
+            score_dict.update(dict(p_value=self._compute_p_value(green_token_count, optimal_window_size)))
 
         # Return per-token results for mask. This is still the same, just scored by windows
         # todo would be to mark the actually counted tokens differently
