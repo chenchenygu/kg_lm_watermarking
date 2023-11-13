@@ -25,7 +25,7 @@ def seeding_scheme_lookup(seeding_scheme: str):
         context_width = 1
         self_salt = False
         hash_key = 15485863
-    if seeding_scheme == "key_42":
+    elif seeding_scheme == "key_42":
         prf_type = "additive_prf"
         context_width = 1
         self_salt = False
